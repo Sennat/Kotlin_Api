@@ -15,12 +15,13 @@ class ApiCall {
         println("-----------------------------------")
         //println("An Api call to demonstrate for searching a bible verse. Just enter BOOK+CHAPTER:VERSE.")
 
-        print("Enter a bible verse (Ex. John 3:16 OR John 3:1-16):\t")
+        print("Enter a bible verse (Ex. John 3:16 OR John 3:1-16) OR enter for random verse:\t")
         input = readln()
-        if (input.isBlank()){
-            input = randVerse
+        if (input.isNotBlank()) {
+            input.also { it.replace("\\s".toRegex(),"+").lowercase(Locale.getDefault()) }
+            println(input)
         } else {
-            input.replace(" ", "+").lowercase(Locale.getDefault())
+            input = randVerse
         }
 
     }
@@ -70,13 +71,13 @@ class ApiCall {
                 println("Response Data: ${response.toString()}")
                 println("Response status code: ${HttpURLConnection.HTTP_OK}")
 
-
             }
 
             HttpURLConnection.HTTP_MULT_CHOICE -> println("The request has more than one possible response. Response code: ${HttpURLConnection.HTTP_MULT_CHOICE}")
             HttpURLConnection.HTTP_BAD_REQUEST -> println("Bad Request. The request could not be understood by the server due to incorrect syntax. Response code: ${HttpURLConnection.HTTP_BAD_REQUEST}")
             HttpURLConnection.HTTP_UNAUTHORIZED -> println("The request requires user authentication information. Response code: ${HttpURLConnection.HTTP_UNAUTHORIZED}")
             HttpURLConnection.HTTP_NOT_FOUND -> println("The server can not find the requested resource. Response code: ${HttpURLConnection.HTTP_NOT_FOUND}")
+
         }
     }
 }
