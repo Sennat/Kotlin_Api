@@ -31,7 +31,7 @@ class ApiCall {
             val connection = url.openConnection() as HttpURLConnection
 
             //get request method
-            connection.requestMethod = ConnectionMethod.GET.toString()
+            connection.requestMethod = RESTApiMethods.GET.toString()
             connection.setRequestProperty("Accept", "application/json")
 
             //Get response code
