@@ -7,19 +7,19 @@ import java.util.*
 //import com.google.gson.*
 
 class ApiCall {
-    private lateinit var input: String
+    private var input: String
     private var randVerse = "?random=verse"
 
     init {
         println("\n==== BIBLE VERSE SEARCH ====")
-        println("-----------------------------------")
-        //println("An Api call to demonstrate for searching a bible verse. Just enter BOOK+CHAPTER:VERSE.")
+        println("An Api call to demonstrate for searching a bible verse")
+        println("---------------------")
 
-        print("Enter a bible verse (Ex. John 3:16 OR John 3:1-16) OR enter for random verse:\t")
+        print("Enter a verse Ex. (John 3:16 OR John 3:1-16) OR enter for random verse:\t")
         input = readln()
         if (input.isNotBlank()) {
-            input.also { it.replace("\\s".toRegex(),"+").lowercase(Locale.getDefault()) }
-            println(input)
+            input.removeWhitespaces().also { it.lowercase(Locale.getDefault()) }
+            //println(input)
         } else {
             input = randVerse
         }
@@ -68,7 +68,7 @@ class ApiCall {
 //                }
 
                 response.map { it.toString().replace("\n", " ") }
-                println("Response Data: ${response.toString()}")
+                println("Response Data: $response")
                 println("Response status code: ${HttpURLConnection.HTTP_OK}")
 
             }
@@ -80,4 +80,6 @@ class ApiCall {
 
         }
     }
+
+    private fun String.removeWhitespaces() = replace("\\s+".toRegex(), "+")
 }
