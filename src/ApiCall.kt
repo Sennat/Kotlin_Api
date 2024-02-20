@@ -1,10 +1,12 @@
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.util.*
-//import com.google.gson.*
 
 class ApiCall {
     private var input: String
@@ -13,7 +15,7 @@ class ApiCall {
     init {
         println("\n==== BIBLE VERSE SEARCH ====")
         println("An Api call to demonstrate for searching a bible verse")
-        println("---------------------")
+        println("--------------------------------------------------------")
 
         print("Enter a verse Ex. (John 3:16 OR John 3:1-16) OR enter for random verse:\t")
         input = readln()
@@ -27,7 +29,6 @@ class ApiCall {
     }
 
     fun requestData() {
-        try {
             val url: URL = URI.create(apiUrl.plus(input)).toURL()
             val connection = url.openConnection() as HttpURLConnection
 
@@ -37,12 +38,17 @@ class ApiCall {
 
             //Get response code
             val responseCode = connection.responseCode
-            //Read nd print response data
-            handleResponse(responseCode, connection)
 
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            try {
+
+                //Read and print response data
+                handleResponse(responseCode, connection)
+
+            } catch (e: Exception) {
+                println("Error: ${e.message.toString()}")
+            } finally {
+
+            }
 
     }
 
@@ -53,23 +59,33 @@ class ApiCall {
 
                 //Read response data
                 val reader = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = StringBuilder()
+                val res = StringBuilder()
                 reader.useLines { lines ->
-                    lines.forEach { response.append(it) }
+                    lines.forEach { res.append(it) }
                 }
 
                 reader.close()
 
-                //val jsonObject: JsonObject = Gson().fromJson<Bible>(response, Bible::class.java)
+                val data = ResultState.SUCCESS(res).response
+                val jsonObject: JsonObject = JsonParser.parseString(data.toString()).asJsonObject
+                val bible = Gson().fromJson(jsonObject, Bible::class.java)
 
-//                val data = JSONArray(response.toString())
-//                data.forEach{
-//                    JSONObject obj = data.optJSONObject(it)
-//                }
+                println("")
+                println("   ~~ VERSE OF THE DAY ~~  ")
+                println("*-----------------------------*")
 
-                response.map { it.toString().replace("\n", " ") }
-                println("Response Data: $response")
-                println("Response status code: ${HttpURLConnection.HTTP_OK}")
+                bible.verses.forEach {
+                    println(
+                        "${
+                            it.text.replace(
+                                "\n",
+                                ""
+                            )
+                        } ~~${it.bookName} ${it.chapter}:${it.verse}"
+                    )
+                }
+                println("Translation: ${bible.translationName}")
+                //println("Response status code: ${HttpURLConnection.HTTP_OK}")
 
             }
 
